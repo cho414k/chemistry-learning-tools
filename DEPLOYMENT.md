@@ -33,5 +33,10 @@
 - Firebase 에뮬레이터: 본인 CRUD, 다른 계정 및 비로그인 차단, Google 외 인증 차단, 목록 수 제한, 잘못된 값·날짜 차단, 생성 시각 불변성 등 7개 통과.
 - 실제 Supabase: 합성 계정 두 개로 가입·로그인·세션 갱신·자기 기록 저장/조회·다른 사용자 차단·비로그인 차단·잘못된 점수 차단·중복 방지 확인. 테스트 계정과 기록은 정리했습니다.
 - Supabase 보안 검사에서 signup_limits의 RLS 정책 없음은 의도한 관리자 전용 차단입니다. anon/authenticated에는 테이블 및 함수 접근을 부여하지 않았습니다.
+- Supabase의 유출 비밀번호 차단은 비활성 상태입니다. [공식 안내](https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection)에 따르면 Pro 이상 기능이므로 유료 전환 없이 활성화하지 않았습니다. 수업용 비밀번호를 다른 서비스와 재사용하지 마세요.
+- 실제 Vercel 브라우저에서 합성 계정 로그인 → 5문항 완료 → 저장 성공 → 새로고침 후 첫 시도 정답 5/5·시도 5회·500코인 조회 → 로그아웃과 화면 기록 제거를 확인했습니다.
+- 실제 Google 계정 로그인은 계정 선택 팝업까지 열림을 확인했습니다. 자동 브라우저가 팝업 입력에 응답하지 않아 계정 선택 이후의 실계정 저장 확인은 사용자 확인이 필요합니다.
 - Firebase Security Rules are prototypes: they restrict access to the matching Google UID, validate every write, and bound list requests. Review before wider use. 이 검증은 모든 공격 경로나 운영 부하를 검증한 침투 시험이 아닙니다.
 - Firebase Spark 플랜과 Supabase/Vercel의 현재 계정 자원을 사용합니다. 결제 계정 연결 또는 유료 플랜 전환을 수행하지 않았습니다. 무료 할당량을 넘으면 기능이 제한될 수 있습니다.
+
+Firestore 테스트 재현: Java 21 이상과 Node.js 24를 준비하고 firebase-diary 폴더에서 `pnpm install --frozen-lockfile` 후 `npx -y firebase-tools@latest emulators:exec --only firestore --project demo-classroom-diary "node --test tests/rules.test.cjs"`를 실행합니다. demo 프로젝트는 실제 서비스에 쓰지 않습니다.
