@@ -1,0 +1,12 @@
+{
+  "firestore":{"database":"(default)","location":"asia-northeast3","rules":"firestore.rules","indexes":"firestore.indexes.json"},
+  "auth":{"authorizedDomains":["localhost","chem-lab-diary-cho414k.firebaseapp.com","chem-lab-diary-cho414k.web.app"]},
+  "hosting":{"public":"public","ignore":["firebase.json","**/.*","**/node_modules/**"],"headers":[{"source":"**","headers":[
+    {"key":"X-Content-Type-Options","value":"nosniff"},
+    {"key":"Referrer-Policy","value":"no-referrer"},
+    {"key":"Cache-Control","value":"no-store"},
+    {"key":"Cross-Origin-Opener-Policy","value":"same-origin-allow-popups"},
+    {"key":"Content-Security-Policy","value":"default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://securetoken.googleapis.com; frame-src https://chem-lab-diary-cho414k.firebaseapp.com https://accounts.google.com; style-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"}
+  ]}]},
+  "emulators":{"auth":{"port":9099},"firestore":{"port":8080},"singleProjectMode":true}
+}

@@ -1,5 +1,7 @@
 # 소스 공개 점검 — 2026-10-17
 
+후속 배포와 인증·저장 접근 권한 검증은 DEPLOYMENT.md를 참조하세요. 아래 내용은 최초 소스 공개 시점의 기록이며, chemistry-portal의 저장값 HTML 삽입 위험은 후속 배포에서 정수·범위 검증으로 수정했습니다. 로컬 일기 서버는 배포하지 않았으며 Firebase 일기장을 별도로 구성했습니다.
+
 범위: chemistry-portal, enthalpy-hub, gas-cafe 웹 소스. 개인 스킬·개발 산출물 및 기존 하위 Git 이력은 제외합니다.
 
 - 실제 local-data/diary.sqlite 발견: 내용은 열람하지 않았으며 Git 제외 규칙에 추가했습니다.

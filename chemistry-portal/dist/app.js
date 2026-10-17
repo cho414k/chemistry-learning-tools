@@ -1,6 +1,6 @@
 const $=s=>document.querySelector(s);
 const dialog=$('#game-dialog'),content=$('#game-content');
-let records={};try{records=JSON.parse(localStorage.getItem('chem-club-records')||'{}')||{};}catch{}
+let records=Object.create(null);try{const raw=JSON.parse(localStorage.getItem('chem-club-records')||'{}');for(const key of ['quiz','balance','builder']){const r=raw?.[key],total=key==='quiz'?5:3;if(r&&Number.isSafeInteger(r.best)&&r.best>=0&&r.best<=total&&r.total===total&&Number.isSafeInteger(r.plays)&&r.plays>=0&&r.plays<Number.MAX_SAFE_INTEGER)records[key]={best:r.best,total,plays:r.plays};}}catch{}
 const names={quiz:'너의 이름은, 원소.',balance:'모든 반응에는 균형이.',builder:'함께라서, 새로운 세계.'};
 const quizzes=[['O','산소',['산소','금','수소','탄소'],'산소의 원자 번호는 8이에요.'],['Na','나트륨',['질소','네온','나트륨','니켈'],'Na는 라틴어 Natrium에서 왔어요.'],['Fe','철',['플루오린','철','금','은'],'철의 기호 Fe는 라틴어 Ferrum에서 왔어요.'],['Au','금',['은','아르곤','알루미늄','금'],'금의 원자 번호는 79예요.'],['C','탄소',['칼슘','염소','탄소','구리'],'탄소는 생명체를 구성하는 주요 원소예요.']];
 const reactions=[{parts:['H₂','O₂','H₂O'],answer:[2,1,2],hint:'양쪽의 H 원자 수와 O 원자 수가 같아야 해요.'},{parts:['N₂','H₂','NH₃'],answer:[1,3,2],hint:'N을 먼저 맞추고, H 원자를 세어보세요.'},{parts:['Fe','O₂','Fe₂O₃'],answer:[4,3,2],hint:'O 원자 수를 6개로 맞추면 쉬워요.'}];

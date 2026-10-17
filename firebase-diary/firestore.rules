@@ -1,0 +1,33 @@
+// users/{uid}/entries/{id}: required date:string YYYY-MM-DD; day:timestamp
+// (UTC midnight matching date); mood:enum; title:string 1..120; body:string
+// 1..100000; created_at:immutable timestamp; updated_at:server timestamp.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owns(uid) {
+      return request.auth != null && request.auth.uid == uid
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function validEntry(data) {
+      return data.keys().hasAll(['date','day','mood','title','body','created_at','updated_at'])
+        && data.keys().hasOnly(['date','day','mood','title','body','created_at','updated_at'])
+        && data.date is string && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && data.day is timestamp && data.day.year() >= 1900 && data.day.year() <= 2100
+        && data.day == timestamp.date(int(data.date.split('-')[0]), int(data.date.split('-')[1]), int(data.date.split('-')[2]))
+        && data.mood in ['평온','좋음','보통','속상','피곤']
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 120
+        && data.body is string && data.body.size() >= 1 && data.body.size() <= 100000
+        && data.created_at is timestamp && data.updated_at == request.time;
+    }
+    match /users/{uid}/entries/{entryId} {
+      allow get: if owns(uid);
+      allow list: if owns(uid) && request.query.limit != null && request.query.limit <= 50;
+      allow create: if owns(uid) && validEntry(request.resource.data)
+        && request.resource.data.created_at == request.time;
+      allow update: if owns(uid) && validEntry(request.resource.data)
+        && request.resource.data.created_at == resource.data.created_at;
+      allow delete: if owns(uid);
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

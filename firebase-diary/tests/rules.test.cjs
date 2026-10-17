@@ -1,0 +1,18 @@
+const {createRequire}=require('node:module');
+const path=require('node:path');
+const fs=require('node:fs');
+const sdkRequire=require;
+const {initializeTestEnvironment,assertSucceeds,assertFails}=sdkRequire('@firebase/rules-unit-testing');
+const {doc,collection,setDoc,updateDoc,deleteDoc,getDoc,getDocs,query,orderBy,limit,serverTimestamp,Timestamp}=sdkRequire('firebase/firestore');
+const {test,before,after}=require('node:test');
+let env,a,b,anon;
+const entry=()=>({date:'2026-10-17',day:Timestamp.fromDate(new Date('2026-10-17T00:00:00Z')),title:'합성 테스트',body:'실제 일기가 아닙니다.',mood:'평온',created_at:serverTimestamp(),updated_at:serverTimestamp()});
+before(async()=>{env=await initializeTestEnvironment({projectId:'demo-classroom-diary',firestore:{host:'127.0.0.1',port:8080,rules:fs.readFileSync(path.join(__dirname,'../firestore.rules'),'utf8')}});a=env.authenticatedContext('alice',{firebase:{sign_in_provider:'google.com'}}).firestore();b=env.authenticatedContext('bob',{firebase:{sign_in_provider:'google.com'}}).firestore();anon=env.unauthenticatedContext().firestore();});
+after(async()=>{await env?.cleanup();});
+test('Google user can create/read/update/delete own diary',async()=>{const ref=doc(a,'users/alice/entries/own');await assertSucceeds(setDoc(ref,entry()));await assertSucceeds(getDoc(ref));await assertSucceeds(updateDoc(ref,{title:'수정한 제목',updated_at:serverTimestamp()}));await assertSucceeds(deleteDoc(ref));});
+test('unauthenticated and other accounts cannot read or write',async()=>{await assertFails(setDoc(doc(b,'users/alice/entries/spoof'),entry()));await assertFails(getDoc(doc(b,'users/alice/entries/own')));await assertFails(getDoc(doc(anon,'users/alice/entries/own')));await assertFails(setDoc(doc(anon,'users/alice/entries/anon'),entry()));});
+test('other accounts cannot delete or update',async()=>{await assertSucceeds(setDoc(doc(a,'users/alice/entries/isolation'),entry()));await assertFails(updateDoc(doc(b,'users/alice/entries/isolation'),{title:'변조',updated_at:serverTimestamp()}));await assertFails(deleteDoc(doc(b,'users/alice/entries/isolation')));});
+test('non-Google authentication rejected',async()=>{const email=env.authenticatedContext('alice',{firebase:{sign_in_provider:'password'}}).firestore();await assertFails(getDoc(doc(email,'users/alice/entries/isolation')));});
+test('list is bounded and scoped to owner',async()=>{await assertSucceeds(getDocs(query(collection(a,'users/alice/entries'),orderBy('date','desc'),limit(50))));await assertFails(getDocs(collection(a,'users/alice/entries')));await assertFails(getDocs(query(collection(a,'users/alice/entries'),limit(51))));await assertFails(getDocs(query(collection(b,'users/alice/entries'),limit(50))));});
+test('required fields, lengths, dates, enums and unexpected fields are checked',async()=>{const ref=doc(a,'users/alice/entries/invalid');for(const value of [{...entry(),title:''},{...entry(),body:'a'.repeat(100001)},{...entry(),mood:'unknown'},{...entry(),date:'2026-02-31'},{...entry(),owner:'bob'}])await assertFails(setDoc(ref,value));const missing=entry();delete missing.body;await assertFails(setDoc(ref,missing));});
+test('created timestamp immutable and updated timestamp server controlled',async()=>{const ref=doc(a,'users/alice/entries/immutable');await assertSucceeds(setDoc(ref,entry()));await assertFails(updateDoc(ref,{created_at:Timestamp.fromMillis(0),updated_at:serverTimestamp()}));await assertFails(updateDoc(ref,{updated_at:Timestamp.fromMillis(0)}));});
