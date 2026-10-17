@@ -1,0 +1,28 @@
+# Local data and credentials must never be published.
+**/local-data/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+**/.openai/
+**/.codex/
+**/.agents/
+**/.aws/
+**/node_modules/
+.skill-validation-deps/
+*.log
+**/preview*.png
+# Personal authoring tools and local audit evidence are outside the web projects.
+/skills/
+/build_socratic_skill.py
+/audit-local.cjs
+/AUDIT-EVIDENCE.json
+/AUDIT-2026-10-17.md
+/DEVELOPMENT_SPEC.md
