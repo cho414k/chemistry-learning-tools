@@ -26,3 +26,8 @@
 /AUDIT-EVIDENCE.json
 /AUDIT-2026-10-17.md
 /DEVELOPMENT_SPEC.md
+/.deploy-tools/
+/.deploy-private/
+/pages-site/
+**/.firebase/
+**/.vercel/
